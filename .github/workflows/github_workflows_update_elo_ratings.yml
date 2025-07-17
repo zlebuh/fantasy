@@ -1,5 +1,8 @@
 name: Update Elo Ratings
 
+permissions:
+  contents: write   # Důležité! Umožní workflowu pushovat změny do repozitáře
+
 on:
   schedule:
     - cron: '0 6 * * *'
@@ -10,17 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: pip install requests beautifulsoup4
+
       - name: Run scraper
         run: python update_elo_ratings.py
+
       - name: Commit and push if changed
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git add elo.csv
           git diff --cached --quiet || (git commit -m "Update Elo ratings" && git push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
