@@ -17,6 +17,19 @@
         .chance3 { background: #ffffcc; }
         .chance4 { background: #d7f2b2; }
         .chance5 { background: #b2e5b2; } /* nejvyšší (zelená) */
+        footer {
+            margin-top: 45px;
+            font-size: 14px;
+            color: #444;
+            background: #f9f9f9;
+            border-top: 1px solid #ccc;
+            padding: 20px 10px 10px 10px;
+            text-align: center;
+        }
+        .footnote {
+            color: #666;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -28,15 +41,25 @@
             <span style="display:inline-block;width:26px;height:20px;background:#ffffcc;border:1px solid #bbb;text-align:center;">3</span>
             <span style="display:inline-block;width:26px;height:20px;background:#ffe5b2;border:1px solid #bbb;text-align:center;">4</span>
             <span style="display:inline-block;width:26px;height:20px;background:#ffcccc;border:1px solid #bbb;text-align:center;">5</span>
-            <span style="margin-left:10px; font-size:13px;">1 = Snadné, 5 = Náročné</span>
+            <span style="margin-left:10px; font-size:13px;">1 = Snadné, 5 = Náročné, DOMA, venku</span>
         </div>
     </div>
     
     <div id="schedule"></div>
 
+    <footer>
+        <div>
+            ELO ratingy jsou převzaty ze stránky
+            <a href="https://elofootball.com/country.php?countryiso=CZE&season=2024-2025" target="_blank" rel="noopener">elofootball.com</a>.
+            Děkuji autorům za jejich práci.<br>
+            Tato stránka je nekomerční a slouží pouze pro fanouškovské a analytické účely.
+        </div>
+        <div id="last-update" style="margin-top:9px; color:#666;">
+            <!-- Datum updatu dosadí JS -->
+        </div>
+    </footer>
+
     <script>
-
-
         let eloCsv = null;
         let eloTable = null;
         const teamElo = {};
@@ -55,6 +78,8 @@
                 eloTable.forEach(row => {
                     teamElo[row.Zkratka] = parseInt(row.Elo_rating, 10);
                 });
+                // Zobraz čas aktualizace v patičce
+                updateFooterUpdateTime();
                 console.log('ELO ratings loaded:', teamElo);
             })
             .catch(error => {
@@ -114,6 +139,16 @@
                 document.getElementById('schedule').innerHTML = '<p>Chyba při načítání schedule.csv: ' + error.message + '</p>';
             });
 
+        function updateFooterUpdateTime() {
+            // Pokud máme datum aktualizace, zobraz ho v patičce
+            const el = document.getElementById('last-update');
+            if (updated) {
+                el.textContent = "Poslední aktualizace ELO ratingů: " + updated;
+            } else {
+                el.textContent = "";
+            }
+        }
+
         function probabilityClass(prob) {
             if (prob < 0.2) return "chance1";
             if (prob < 0.4) return "chance2";
@@ -153,24 +188,17 @@
             return { objects, updated };
         }
 
-
-
-        // Parse schedule
-
         // ELO win probability (no draws)
         function eloWinProb(eloA, eloB) {
-            // P(A beats B) = 1 / (1 + 10^((ELO_B - ELO_A)/400))
             return 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
         }
 
-        // Helper for team code -> full name
         function teamNameFromCode(code) {
             const row = eloTable.find(x => x.Zkratka === code);
             return row ? row.Tým : code;
         }
         // Render table
         function renderScheduleTable() {
-            // const teamElo = getTeamElo(eloTable);
             let html = '<table><thead><tr><th>Tým</th>';
             for (let r = 1; r <= 30; r++) html += `<th>${r}</th>`;
             html += '</tr></thead><tbody>';
@@ -198,8 +226,6 @@
             html += '</tbody></table>';
             document.getElementById('schedule').innerHTML = html;
         }
-
-        // renderScheduleTable();
     </script>
 </body>
 </html>
