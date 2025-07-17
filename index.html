@@ -124,6 +124,7 @@
             const lines = csv.trim().split('\n');
             const header = lines[0].split(',').map(x => x.trim());
             return lines.slice(1).map(line => {
+                if (line.trim()[0] === '#') return null; // Skip comments
                 const vals = line.split(',').map(x => x.trim());
                 let obj = {};
                 header.forEach((h, i) => obj[h] = vals[i]);
