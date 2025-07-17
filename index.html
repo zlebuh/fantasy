@@ -38,9 +38,7 @@
 
 
         let eloCsv = null;
-        // Parse ELO ratings
-        const eloTable = null;
-        // Map team codes to ELO
+        let eloTable = null;
         const teamElo = {};
 
         fetch('elo.csv')
@@ -60,8 +58,8 @@
                 document.getElementById('schedule').innerHTML = '<p>Chyba při načítání elo.csv: ' + error.message + '</p>';
             });
 
-        const scheduleCsv = null;
-        const scheduleRows = null;
+        let scheduleCsv = null;
+        let scheduleRows = null;
         let scheduleMatrix = [];
 
         fetch('schedule.csv')
