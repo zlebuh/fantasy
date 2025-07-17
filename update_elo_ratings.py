@@ -50,7 +50,7 @@ OUTPUT_CSV = "elo.csv"
 
 def fetch_elo_table():
     """Fetch the ELO table from the web page and return as a list of dicts."""
-    resp = requests.get(URL, timeout=60, retries=3)
+    resp = requests.get(URL, timeout=60)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.content, "html.parser")
     table = soup.find("div", id="Ranking").find("table")

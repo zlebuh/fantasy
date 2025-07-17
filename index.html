@@ -40,6 +40,7 @@
         let eloCsv = null;
         let eloTable = null;
         const teamElo = {};
+        let updated = null;
 
         fetch('elo.csv')
             .then(response => {
@@ -48,7 +49,9 @@
             })
             .then(text => {
                 eloCsv = text;
-                eloTable = parseCsv(eloCsv);
+                parsed = parseCsv(eloCsv);
+                eloTable = parsed.objects;
+                updated = parsed.updated;
                 eloTable.forEach(row => {
                     teamElo[row.Zkratka] = parseInt(row.Elo_rating, 10);
                 });
@@ -69,7 +72,7 @@
             })
             .then(text => {
                 scheduleCsv = text;
-                scheduleRows = parseCsv(scheduleCsv)
+                scheduleRows = parseCsv(scheduleCsv).objects;
 
                 scheduleRows.forEach(row => {
                 const team = row['Tým'];
@@ -120,16 +123,34 @@
         }
 
         function parseCsv(csv) {
-            // Returns array of objects, keys from header
-            const lines = csv.trim().split('\n');
-            const header = lines[0].split(',').map(x => x.trim());
-            return lines.slice(1).map(line => {
-                if (line.trim()[0] === '#') return null; // Skip comments
+            // Rozděl řádky a odstraň prázdné
+            const lines = csv
+                .split('\n')
+                .map(l => l.trim())
+                .filter(l => l !== '');
+
+            let updated = null;
+            let dataLines = lines;
+
+            // Hledej první komentářový řádek a získej z něj datum
+            if (dataLines[0].startsWith('#')) {
+                // Vezme vše za # a případné mezery
+                updated = dataLines[0].slice(1).trim();
+                dataLines = dataLines.slice(1);
+            }
+
+            // Najdi první nekomentovaný řádek jako hlavičku
+            dataLines = dataLines.filter(l => !l.startsWith('#'));
+            if (dataLines.length === 0) return { objects: [], updated };
+
+            const header = dataLines[0].split(',').map(x => x.trim());
+            const objects = dataLines.slice(1).map(line => {
                 const vals = line.split(',').map(x => x.trim());
                 let obj = {};
                 header.forEach((h, i) => obj[h] = vals[i]);
                 return obj;
             });
+            return { objects, updated };
         }
 
 
