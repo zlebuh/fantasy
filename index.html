@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Pravděpodobnosti Výhry podle ELO (Fortuna:Liga)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; margin-bottom: 30px; font-size: 13px;}
+        th, td { border: 1px solid #999; padding: 4px 5px; text-align: center; min-width: 75px; height: 48px;}
+        th { background: #eee; }
+        .home { background: #d6f5d6; text-transform: uppercase; }
+        .away { background: #f5d6d6; text-transform: lowercase; }
+        .teamcol { background: #e2e2e2; font-weight: bold; min-width: 180px; text-align: center; padding-left: 8px;}
+        .prob { font-size: 11px; color: #333; }
+        .chance1 { background: #ffcccc; } /* nejnižší (červená) */
+        .chance2 { background: #ffe5b2; }
+        .chance3 { background: #ffffcc; }
+        .chance4 { background: #d7f2b2; }
+        .chance5 { background: #b2e5b2; } /* nejvyšší (zelená) */
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 18px;">
+        <b>Náročnost zápasů</b>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 7px;">
+            <span style="display:inline-block;width:26px;height:20px;background:#b2e5b2;border:1px solid #bbb;text-align:center;">1</span>
+            <span style="display:inline-block;width:26px;height:20px;background:#d7f2b2;border:1px solid #bbb;text-align:center;">2</span>
+            <span style="display:inline-block;width:26px;height:20px;background:#ffffcc;border:1px solid #bbb;text-align:center;">3</span>
+            <span style="display:inline-block;width:26px;height:20px;background:#ffe5b2;border:1px solid #bbb;text-align:center;">4</span>
+            <span style="display:inline-block;width:26px;height:20px;background:#ffcccc;border:1px solid #bbb;text-align:center;">5</span>
+            <span style="margin-left:10px; font-size:13px;">1 = Snadné, 5 = Náročné</span>
+        </div>
+    </div>
+    
+    <div id="schedule"></div>
+
+    <script>
+        // Data begin
+
+        const eloCsv = `
+Tým,Zkratka,Elo_rating
+Slavia Praha,SKS,1695
+Viktoria Plzeň,PLZ,1617
+Sparta Praha,ACS,1574
+Baník Ostrava,FCB,1526
+Jablonec,FKJ,1488
+Hradec Králové,HKR,1427
+Slovan Liberec,LIB,1420
+Sigma Olomouc,SIG,1385
+Teplice,TEP,1365
+Mladá Boleslav,MBL,1361
+Bohemians 1905,BOH,1356
+Karviná,KAR,1331
+Slovácko,FCS,1321
+Dukla Praha,DUK,1289
+Pardubice,PCE,1271
+Zlín,FCZ,1250
+`;
+
+        const scheduleCsv = `
+Tým,Kolo 1,Kolo 2,Kolo 3,Kolo 4,Kolo 5,Kolo 6,Kolo 7,Kolo 8,Kolo 9,Kolo 10,Kolo 11,Kolo 12,Kolo 13,Kolo 14,Kolo 15,Kolo 16,Kolo 17,Kolo 18,Kolo 19,Kolo 20,Kolo 21,Kolo 22,Kolo 23,Kolo 24,Kolo 25,Kolo 26,Kolo 27,Kolo 28,Kolo 29,Kolo 30
+SKS,HKR,boh,fcs,TEP,fkj,PCE,mbl,KAR,lib,DUK,acs,FCZ,sig,FCB,plz,BOH,FCS,tep,FKJ,pce,MBL,kar,LIB,duk,ACS,fcz,SIG,fcb,PLZ,hkr
+PLZ,pce,FKJ,mbl,FCS,duk,KAR,lib,SIG,acs,FCZ,HKR,boh,FCB,tep,SKS,fkj,MBL,fcs,DUK,kar,LIB,sig,ACS,fcz,hkr,BOH,fcb,TEP,sks,PCE
+FCB,boh,TEP,duk,KAR,pce,FCS,sig,LIB,mbl,ACS,fcz,HKR,plz,sks,FKJ,tep,DUK,kar,PCE,fcs,SIG,lib,MBL,acs,FCZ,hkr,PLZ,SKS,fkj,BOH
+ACS,fkj,MBL,pce,SIG,lib,DUK,FCZ,hkr,PLZ,fcb,SKS,fcs,BOH,kar,TEP,mbl,PCE,sig,LIB,duk,fcz,HKR,plz,FCB,sks,FCS,boh,KAR,tep,FKJ
+FKJ,ACS,plz,HKR,boh,SKS,tep,fcs,PCE,kar,MBL,sig,DUK,lib,FCZ,fcb,PLZ,hkr,BOH,sks,TEP,FCS,pce,KAR,mbl,SIG,duk,LIB,fcz,FCB,acs
+SIG,fcs,DUK,LIB,acs,FCZ,hkr,FCB,plz,TEP,boh,FKJ,kar,SKS,mbl,PCE,duk,lib,ACS,fcz,HKR,fcb,PLZ,tep,BOH,fkj,KAR,sks,MBL,pce,FCS
+MBL,LIB,acs,PLZ,fcz,HKR,boh,SKS,tep,FCB,fkj,FCS,pce,KAR,SIG,duk,ACS,plz,FCZ,hkr,BOH,sks,TEP,fcb,FKJ,fcs,PCE,kar,sig,DUK,lib
+LIB,mbl,PCE,sig,DUK,ACS,fcz,PLZ,fcb,SKS,hkr,BOH,tep,FKJ,fcs,KAR,pce,SIG,duk,acs,FCZ,plz,FCB,sks,HKR,boh,TEP,fkj,FCS,kar,MBL
+HKR,sks,KAR,fkj,PCE,mbl,SIG,duk,ACS,fcz,LIB,plz,fcb,TEP,boh,FCS,kar,FKJ,pce,MBL,sig,DUK,acs,FCZ,lib,PLZ,FCB,tep,BOH,fcs,SKS
+TEP,FCZ,fcb,BOH,sks,fcs,FKJ,kar,MBL,sig,PCE,duk,LIB,hkr,PLZ,acs,FCB,boh,SKS,FCS,fkj,KAR,mbl,SIG,pce,DUK,lib,HKR,plz,ACS,fcz
+KAR,DUK,hkr,FCZ,fcb,BOH,plz,TEP,sks,FKJ,fcs,pce,SIG,mbl,ACS,lib,HKR,fcz,FCB,boh,PLZ,tep,SKS,fkj,FCS,PCE,sig,MBL,acs,LIB,duk
+BOH,FCB,SKS,tep,FKJ,kar,MBL,pce,FCS,duk,SIG,lib,PLZ,acs,HKR,fcz,sks,TEP,fkj,KAR,mbl,PCE,fcs,DUK,sig,LIB,plz,ACS,hkr,FCZ,fcb
+DUK,kar,sig,FCB,lib,PLZ,acs,HKR,fcz,BOH,sks,TEP,fkj,FCS,pce,MBL,SIG,fcb,LIB,plz,ACS,hkr,FCZ,boh,SKS,tep,FKJ,fcs,PCE,mbl,KAR
+FCS,SIG,fcz,SKS,plz,TEP,fcb,FKJ,boh,pce,KAR,mbl,ACS,duk,LIB,hkr,FCZ,sks,PLZ,tep,FCB,fkj,BOH,PCE,kar,MBL,acs,DUK,lib,HKR,sig
+PCE,PLZ,lib,ACS,hkr,FCB,sks,BOH,fkj,FCS,tep,KAR,MBL,fcz,DUK,sig,LIB,acs,HKR,fcb,SKS,boh,FKJ,fcs,TEP,kar,mbl,FCZ,duk,SIG,plz
+FCZ,tep,FCS,kar,MBL,sig,LIB,acs,DUK,HKR,plz,FCB,sks,PCE,fkj,BOH,fcs,KAR,mbl,SIG,lib,ACS,duk,hkr,PLZ,fcb,SKS,pce,FKJ,boh,TEP
+`;
+
+        // Data end
+
+        function probabilityClass(prob) {
+            if (prob < 0.2) return "chance1";
+            if (prob < 0.4) return "chance2";
+            if (prob < 0.6) return "chance3";
+            if (prob < 0.8) return "chance4";
+            return "chance5";
+        }
+
+        function parseCsv(csv) {
+            // Returns array of objects, keys from header
+            const lines = csv.trim().split('\n');
+            const header = lines[0].split(',').map(x => x.trim());
+            return lines.slice(1).map(line => {
+                const vals = line.split(',').map(x => x.trim());
+                let obj = {};
+                header.forEach((h, i) => obj[h] = vals[i]);
+                return obj;
+            });
+        }
+
+        // Parse ELO ratings
+        const eloTable = parseCsv(eloCsv);
+        // Map team codes to ELO
+        const teamElo = {};
+        eloTable.forEach(row => {
+            teamElo[row.Zkratka] = parseInt(row.Elo_rating, 10);
+        });
+
+        // Parse schedule
+        const scheduleRows = parseCsv(scheduleCsv);
+
+        // ELO win probability (no draws)
+        function eloWinProb(eloA, eloB) {
+            // P(A beats B) = 1 / (1 + 10^((ELO_B - ELO_A)/400))
+            return 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
+        }
+
+        // Prepare matrix: team -> [list of rounds with {opponent, isHome, probability}]
+        let scheduleMatrix = [];
+        scheduleRows.forEach(row => {
+            const team = row['Tým'];
+            let teamRow = {
+                team,
+                games: []
+            };
+            for (let round = 1; round <= 30; round++) {
+                let opponentCode = row[`Kolo ${round}`];
+                if (!opponentCode) {
+                    teamRow.games.push(null);
+                    continue;
+                }
+                const isHome = /^[A-Z]+$/.test(opponentCode);
+                const opponent = opponentCode.toUpperCase();
+                let homeElo, awayElo, prob;
+                if (isHome) {
+                    // team is home
+                    homeElo = (teamElo[team] || 1300) + 100;
+                    awayElo = teamElo[opponent] || 1300;
+                    prob = eloWinProb(homeElo, awayElo);
+                } else {
+                    // team is away
+                    homeElo = (teamElo[opponent] || 1300) + 100;
+                    awayElo = teamElo[team] || 1300;
+                    prob = 1 - eloWinProb(homeElo, awayElo); // Probability of away win is 1-P(home)
+                }
+                teamRow.games.push({
+                    opponentCode, // with original case
+                    prob
+                });
+            }
+            scheduleMatrix.push(teamRow);
+        });
+
+        // Helper for team code -> full name
+        function teamNameFromCode(code) {
+            const row = eloTable.find(x => x.Zkratka === code);
+            return row ? row.Tým : code;
+        }
+        // Render table
+        function renderScheduleTable() {
+            // const teamElo = getTeamElo(eloTable);
+            let html = '<table><thead><tr><th>Tým</th>';
+            for (let r = 1; r <= 30; r++) html += `<th>${r}</th>`;
+            html += '</tr></thead><tbody>';
+            scheduleMatrix.forEach(row => {
+                const elo = teamElo[row.team] ?? '';
+                html += `<tr><td class="teamcol">
+                    <div><strong>${teamNameFromCode(row.team, eloTable)}</strong></div>
+                    <div style="font-size:12px;">(${row.team})</div>
+                    <div style="font-size:12px;color:#666;">ELO: <strong>${elo}</strong></div>
+                </td>`;
+                row.games.forEach(game => {
+                    if (!game) {
+                        html += '<td></td>';
+                        return;
+                    }
+                    const isHome = /^[A-Z]+$/.test(game.opponentCode);
+                    let probClass = probabilityClass(game.prob);
+                    html += `<td class="${isHome ? "home" : "away"} ${probClass}">` +
+                        `${game.opponentCode}<br>` +
+                        `<span class="prob">${(game.prob * 100).toFixed(1)}%</span>` +
+                        `</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('schedule').innerHTML = html;
+        }
+
+        renderScheduleTable();
+    </script>
+</body>
+</html>
