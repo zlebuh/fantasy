@@ -35,64 +35,83 @@
     <div id="schedule"></div>
 
     <script>
-        // Data begin
 
-//         const eloCsv = `
-// Tým,Zkratka,Elo_rating
-// Slavia Praha,SKS,1695
-// Viktoria Plzeň,PLZ,1617
-// Sparta Praha,ACS,1574
-// Baník Ostrava,FCB,1526
-// Jablonec,FKJ,1488
-// Hradec Králové,HKR,1427
-// Slovan Liberec,LIB,1420
-// Sigma Olomouc,SIG,1385
-// Teplice,TEP,1365
-// Mladá Boleslav,MBL,1361
-// Bohemians 1905,BOH,1356
-// Karviná,KAR,1331
-// Slovácko,FCS,1321
-// Dukla Praha,DUK,1289
-// Pardubice,PCE,1271
-// Zlín,FCZ,1250
-// `;
 
-let eloCsv = null;
-fetch('elo.csv')
-  .then(response => {
-    if (!response.ok) throw new Error('Soubor elo.csv se nepodařilo načíst');
-    return response.text();
-  })
-  .then(text => {
-    eloCsv = text;
-    // zde zavolej funkci, která vykreslí tabulku, např.:
-    renderScheduleTable();
-  })
-  .catch(error => {
-    document.getElementById('schedule').innerHTML = '<p>Chyba při načítání elo.csv: ' + error.message + '</p>';
-  });
+        let eloCsv = null;
+        // Parse ELO ratings
+        const eloTable = null;
+        // Map team codes to ELO
+        const teamElo = {};
 
-        const scheduleCsv = `
-Tým,Kolo 1,Kolo 2,Kolo 3,Kolo 4,Kolo 5,Kolo 6,Kolo 7,Kolo 8,Kolo 9,Kolo 10,Kolo 11,Kolo 12,Kolo 13,Kolo 14,Kolo 15,Kolo 16,Kolo 17,Kolo 18,Kolo 19,Kolo 20,Kolo 21,Kolo 22,Kolo 23,Kolo 24,Kolo 25,Kolo 26,Kolo 27,Kolo 28,Kolo 29,Kolo 30
-SKS,HKR,boh,fcs,TEP,fkj,PCE,mbl,KAR,lib,DUK,acs,FCZ,sig,FCB,plz,BOH,FCS,tep,FKJ,pce,MBL,kar,LIB,duk,ACS,fcz,SIG,fcb,PLZ,hkr
-PLZ,pce,FKJ,mbl,FCS,duk,KAR,lib,SIG,acs,FCZ,HKR,boh,FCB,tep,SKS,fkj,MBL,fcs,DUK,kar,LIB,sig,ACS,fcz,hkr,BOH,fcb,TEP,sks,PCE
-FCB,boh,TEP,duk,KAR,pce,FCS,sig,LIB,mbl,ACS,fcz,HKR,plz,sks,FKJ,tep,DUK,kar,PCE,fcs,SIG,lib,MBL,acs,FCZ,hkr,PLZ,SKS,fkj,BOH
-ACS,fkj,MBL,pce,SIG,lib,DUK,FCZ,hkr,PLZ,fcb,SKS,fcs,BOH,kar,TEP,mbl,PCE,sig,LIB,duk,fcz,HKR,plz,FCB,sks,FCS,boh,KAR,tep,FKJ
-FKJ,ACS,plz,HKR,boh,SKS,tep,fcs,PCE,kar,MBL,sig,DUK,lib,FCZ,fcb,PLZ,hkr,BOH,sks,TEP,FCS,pce,KAR,mbl,SIG,duk,LIB,fcz,FCB,acs
-SIG,fcs,DUK,LIB,acs,FCZ,hkr,FCB,plz,TEP,boh,FKJ,kar,SKS,mbl,PCE,duk,lib,ACS,fcz,HKR,fcb,PLZ,tep,BOH,fkj,KAR,sks,MBL,pce,FCS
-MBL,LIB,acs,PLZ,fcz,HKR,boh,SKS,tep,FCB,fkj,FCS,pce,KAR,SIG,duk,ACS,plz,FCZ,hkr,BOH,sks,TEP,fcb,FKJ,fcs,PCE,kar,sig,DUK,lib
-LIB,mbl,PCE,sig,DUK,ACS,fcz,PLZ,fcb,SKS,hkr,BOH,tep,FKJ,fcs,KAR,pce,SIG,duk,acs,FCZ,plz,FCB,sks,HKR,boh,TEP,fkj,FCS,kar,MBL
-HKR,sks,KAR,fkj,PCE,mbl,SIG,duk,ACS,fcz,LIB,plz,fcb,TEP,boh,FCS,kar,FKJ,pce,MBL,sig,DUK,acs,FCZ,lib,PLZ,FCB,tep,BOH,fcs,SKS
-TEP,FCZ,fcb,BOH,sks,fcs,FKJ,kar,MBL,sig,PCE,duk,LIB,hkr,PLZ,acs,FCB,boh,SKS,FCS,fkj,KAR,mbl,SIG,pce,DUK,lib,HKR,plz,ACS,fcz
-KAR,DUK,hkr,FCZ,fcb,BOH,plz,TEP,sks,FKJ,fcs,pce,SIG,mbl,ACS,lib,HKR,fcz,FCB,boh,PLZ,tep,SKS,fkj,FCS,PCE,sig,MBL,acs,LIB,duk
-BOH,FCB,SKS,tep,FKJ,kar,MBL,pce,FCS,duk,SIG,lib,PLZ,acs,HKR,fcz,sks,TEP,fkj,KAR,mbl,PCE,fcs,DUK,sig,LIB,plz,ACS,hkr,FCZ,fcb
-DUK,kar,sig,FCB,lib,PLZ,acs,HKR,fcz,BOH,sks,TEP,fkj,FCS,pce,MBL,SIG,fcb,LIB,plz,ACS,hkr,FCZ,boh,SKS,tep,FKJ,fcs,PCE,mbl,KAR
-FCS,SIG,fcz,SKS,plz,TEP,fcb,FKJ,boh,pce,KAR,mbl,ACS,duk,LIB,hkr,FCZ,sks,PLZ,tep,FCB,fkj,BOH,PCE,kar,MBL,acs,DUK,lib,HKR,sig
-PCE,PLZ,lib,ACS,hkr,FCB,sks,BOH,fkj,FCS,tep,KAR,MBL,fcz,DUK,sig,LIB,acs,HKR,fcb,SKS,boh,FKJ,fcs,TEP,kar,mbl,FCZ,duk,SIG,plz
-FCZ,tep,FCS,kar,MBL,sig,LIB,acs,DUK,HKR,plz,FCB,sks,PCE,fkj,BOH,fcs,KAR,mbl,SIG,lib,ACS,duk,hkr,PLZ,fcb,SKS,pce,FKJ,boh,TEP
-`;
+        fetch('elo.csv')
+            .then(response => {
+                if (!response.ok) throw new Error('Soubor elo.csv se nepodařilo načíst');
+                return response.text();
+            })
+            .then(text => {
+                eloCsv = text;
+                eloTable = parseCsv(eloCsv);
+                eloTable.forEach(row => {
+                    teamElo[row.Zkratka] = parseInt(row.Elo_rating, 10);
+                });
+                console.log('ELO ratings loaded:', teamElo);
+            })
+            .catch(error => {
+                document.getElementById('schedule').innerHTML = '<p>Chyba při načítání elo.csv: ' + error.message + '</p>';
+            });
 
-        // Data end
+        const scheduleCsv = null;
+        const scheduleRows = null;
+        let scheduleMatrix = [];
+
+        fetch('schedule.csv')
+            .then(response => {
+                if (!response.ok) throw new Error('Soubor schedule.csv se nepodařilo načíst');
+                return response.text();
+            })
+            .then(text => {
+                scheduleCsv = text;
+                scheduleRows = parseCsv(scheduleCsv)
+
+                scheduleRows.forEach(row => {
+                const team = row['Tým'];
+                let teamRow = {
+                    team,
+                    games: []
+                };
+                for (let round = 1; round <= 30; round++) {
+                    let opponentCode = row[`Kolo ${round}`];
+                    if (!opponentCode) {
+                        teamRow.games.push(null);
+                        continue;
+                    }
+                    const isHome = /^[A-Z]+$/.test(opponentCode);
+                    const opponent = opponentCode.toUpperCase();
+                    let homeElo, awayElo, prob;
+                    if (isHome) {
+                        // team is home
+                        homeElo = (teamElo[team] || 1300) + 100;
+                        awayElo = teamElo[opponent] || 1300;
+                        prob = eloWinProb(homeElo, awayElo);
+                    } else {
+                        // team is away
+                        homeElo = (teamElo[opponent] || 1300) + 100;
+                        awayElo = teamElo[team] || 1300;
+                        prob = 1 - eloWinProb(homeElo, awayElo); // Probability of away win is 1-P(home)
+                    }
+                    teamRow.games.push({
+                        opponentCode, // with original case
+                        prob
+                    });
+                }
+                scheduleMatrix.push(teamRow);
+            });
+
+                renderScheduleTable();
+            })
+            .catch(error => {
+                document.getElementById('schedule').innerHTML = '<p>Chyba při načítání schedule.csv: ' + error.message + '</p>';
+            });
 
         function probabilityClass(prob) {
             if (prob < 0.2) return "chance1";
@@ -114,58 +133,15 @@ FCZ,tep,FCS,kar,MBL,sig,LIB,acs,DUK,HKR,plz,FCB,sks,PCE,fkj,BOH,fcs,KAR,mbl,SIG,
             });
         }
 
-        // Parse ELO ratings
-        const eloTable = parseCsv(eloCsv);
-        // Map team codes to ELO
-        const teamElo = {};
-        eloTable.forEach(row => {
-            teamElo[row.Zkratka] = parseInt(row.Elo_rating, 10);
-        });
+
 
         // Parse schedule
-        const scheduleRows = parseCsv(scheduleCsv);
 
         // ELO win probability (no draws)
         function eloWinProb(eloA, eloB) {
             // P(A beats B) = 1 / (1 + 10^((ELO_B - ELO_A)/400))
             return 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
         }
-
-        // Prepare matrix: team -> [list of rounds with {opponent, isHome, probability}]
-        let scheduleMatrix = [];
-        scheduleRows.forEach(row => {
-            const team = row['Tým'];
-            let teamRow = {
-                team,
-                games: []
-            };
-            for (let round = 1; round <= 30; round++) {
-                let opponentCode = row[`Kolo ${round}`];
-                if (!opponentCode) {
-                    teamRow.games.push(null);
-                    continue;
-                }
-                const isHome = /^[A-Z]+$/.test(opponentCode);
-                const opponent = opponentCode.toUpperCase();
-                let homeElo, awayElo, prob;
-                if (isHome) {
-                    // team is home
-                    homeElo = (teamElo[team] || 1300) + 100;
-                    awayElo = teamElo[opponent] || 1300;
-                    prob = eloWinProb(homeElo, awayElo);
-                } else {
-                    // team is away
-                    homeElo = (teamElo[opponent] || 1300) + 100;
-                    awayElo = teamElo[team] || 1300;
-                    prob = 1 - eloWinProb(homeElo, awayElo); // Probability of away win is 1-P(home)
-                }
-                teamRow.games.push({
-                    opponentCode, // with original case
-                    prob
-                });
-            }
-            scheduleMatrix.push(teamRow);
-        });
 
         // Helper for team code -> full name
         function teamNameFromCode(code) {
@@ -203,7 +179,7 @@ FCZ,tep,FCS,kar,MBL,sig,LIB,acs,DUK,HKR,plz,FCB,sks,PCE,fkj,BOH,fcs,KAR,mbl,SIG,
             document.getElementById('schedule').innerHTML = html;
         }
 
-        renderScheduleTable();
+        // renderScheduleTable();
     </script>
 </body>
 </html>

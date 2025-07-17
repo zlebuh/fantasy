@@ -1,0 +1,17 @@
+Tým,Kolo 1,Kolo 2,Kolo 3,Kolo 4,Kolo 5,Kolo 6,Kolo 7,Kolo 8,Kolo 9,Kolo 10,Kolo 11,Kolo 12,Kolo 13,Kolo 14,Kolo 15,Kolo 16,Kolo 17,Kolo 18,Kolo 19,Kolo 20,Kolo 21,Kolo 22,Kolo 23,Kolo 24,Kolo 25,Kolo 26,Kolo 27,Kolo 28,Kolo 29,Kolo 30
+SKS,HKR,boh,fcs,TEP,fkj,PCE,mbl,KAR,lib,DUK,acs,FCZ,sig,FCB,plz,BOH,FCS,tep,FKJ,pce,MBL,kar,LIB,duk,ACS,fcz,SIG,fcb,PLZ,hkr
+PLZ,pce,FKJ,mbl,FCS,duk,KAR,lib,SIG,acs,FCZ,HKR,boh,FCB,tep,SKS,fkj,MBL,fcs,DUK,kar,LIB,sig,ACS,fcz,hkr,BOH,fcb,TEP,sks,PCE
+FCB,boh,TEP,duk,KAR,pce,FCS,sig,LIB,mbl,ACS,fcz,HKR,plz,sks,FKJ,tep,DUK,kar,PCE,fcs,SIG,lib,MBL,acs,FCZ,hkr,PLZ,SKS,fkj,BOH
+ACS,fkj,MBL,pce,SIG,lib,DUK,FCZ,hkr,PLZ,fcb,SKS,fcs,BOH,kar,TEP,mbl,PCE,sig,LIB,duk,fcz,HKR,plz,FCB,sks,FCS,boh,KAR,tep,FKJ
+FKJ,ACS,plz,HKR,boh,SKS,tep,fcs,PCE,kar,MBL,sig,DUK,lib,FCZ,fcb,PLZ,hkr,BOH,sks,TEP,FCS,pce,KAR,mbl,SIG,duk,LIB,fcz,FCB,acs
+SIG,fcs,DUK,LIB,acs,FCZ,hkr,FCB,plz,TEP,boh,FKJ,kar,SKS,mbl,PCE,duk,lib,ACS,fcz,HKR,fcb,PLZ,tep,BOH,fkj,KAR,sks,MBL,pce,FCS
+MBL,LIB,acs,PLZ,fcz,HKR,boh,SKS,tep,FCB,fkj,FCS,pce,KAR,SIG,duk,ACS,plz,FCZ,hkr,BOH,sks,TEP,fcb,FKJ,fcs,PCE,kar,sig,DUK,lib
+LIB,mbl,PCE,sig,DUK,ACS,fcz,PLZ,fcb,SKS,hkr,BOH,tep,FKJ,fcs,KAR,pce,SIG,duk,acs,FCZ,plz,FCB,sks,HKR,boh,TEP,fkj,FCS,kar,MBL
+HKR,sks,KAR,fkj,PCE,mbl,SIG,duk,ACS,fcz,LIB,plz,fcb,TEP,boh,FCS,kar,FKJ,pce,MBL,sig,DUK,acs,FCZ,lib,PLZ,FCB,tep,BOH,fcs,SKS
+TEP,FCZ,fcb,BOH,sks,fcs,FKJ,kar,MBL,sig,PCE,duk,LIB,hkr,PLZ,acs,FCB,boh,SKS,FCS,fkj,KAR,mbl,SIG,pce,DUK,lib,HKR,plz,ACS,fcz
+KAR,DUK,hkr,FCZ,fcb,BOH,plz,TEP,sks,FKJ,fcs,pce,SIG,mbl,ACS,lib,HKR,fcz,FCB,boh,PLZ,tep,SKS,fkj,FCS,PCE,sig,MBL,acs,LIB,duk
+BOH,FCB,SKS,tep,FKJ,kar,MBL,pce,FCS,duk,SIG,lib,PLZ,acs,HKR,fcz,sks,TEP,fkj,KAR,mbl,PCE,fcs,DUK,sig,LIB,plz,ACS,hkr,FCZ,fcb
+DUK,kar,sig,FCB,lib,PLZ,acs,HKR,fcz,BOH,sks,TEP,fkj,FCS,pce,MBL,SIG,fcb,LIB,plz,ACS,hkr,FCZ,boh,SKS,tep,FKJ,fcs,PCE,mbl,KAR
+FCS,SIG,fcz,SKS,plz,TEP,fcb,FKJ,boh,pce,KAR,mbl,ACS,duk,LIB,hkr,FCZ,sks,PLZ,tep,FCB,fkj,BOH,PCE,kar,MBL,acs,DUK,lib,HKR,sig
+PCE,PLZ,lib,ACS,hkr,FCB,sks,BOH,fkj,FCS,tep,KAR,MBL,fcz,DUK,sig,LIB,acs,HKR,fcb,SKS,boh,FKJ,fcs,TEP,kar,mbl,FCZ,duk,SIG,plz
+FCZ,tep,FCS,kar,MBL,sig,LIB,acs,DUK,HKR,plz,FCB,sks,PCE,fkj,BOH,fcs,KAR,mbl,SIG,lib,ACS,duk,hkr,PLZ,fcb,SKS,pce,FKJ,boh,TEP
