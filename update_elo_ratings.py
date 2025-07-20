@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 
 # URL of the page to scrape
-URL = "https://elofootball.com/country.php?countryiso=CZE&season=2024-2025"
+URL = "https://elofootball.com/country.php?countryiso=CZE"
 
 TEAM_CODES = {
     "Slavia Praha": "SKS",
