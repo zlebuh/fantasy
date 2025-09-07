@@ -6,44 +6,44 @@ from bs4 import BeautifulSoup
 
 
 # URL of the page to scrape
-URL = "https://elofootball.com/country.php?countryiso=CZE"
+URL = "http://clubelo.com/CZE"
 
 TEAM_CODES = {
     "Slavia Praha": "SKS",
-    "Viktoria Plzen": "PLZ",
-    "AC Sparta Praha": "ACS",
-    "Baník Ostrava": "FCB",
-    "FK Jablonec": "FKJ",
-    "FC Hradec Králové": "HKR",
+    "Viktoria Plzeň": "PLZ",
+    "Sparta Praha": "ACS",
+    "Banik Ostrava": "FCB",
+    "Jablonec": "FKJ",
+    "Hradec Králové": "HKR",
     "Slovan Liberec": "LIB",
     "Sigma Olomouc": "SIG",
-    "FK Teplice": "TEP",
-    "FK Mladá Boleslav": "MBL",
-    "Bohemians Praha 1905": "BOH",
-    "MFK Karviná": "KAR",
-    "1. FC Slovácko": "FCS",
-    "FK Dukla Praha": "DUK",
-    "FK Pardubice": "PCE",
-    "FC Zlín": "FCZ"
+    "Teplice": "TEP",
+    "Mladá Boleslav": "MBL",
+    "Bohemians Praha": "BOH",
+    "Karvina": "KAR",
+    "Slovácko": "FCS",
+    "Dukla": "DUK",
+    "Pardubice": "PCE",
+    "Tescoma Zlin": "FCZ"
 }
 
 CZECH_NAMES = {
     "Slavia Praha": "Slavia Praha",
-    "Viktoria Plzen": "Viktoria Plzeň",
-    "AC Sparta Praha": "Sparta Praha",
-    "Baník Ostrava": "Baník Ostrava",
-    "FK Jablonec": "Jablonec",
-    "FC Hradec Králové": "Hradec Králové",
+    "Viktoria Plzeň": "Viktoria Plzeň",
+    "Sparta Praha": "Sparta Praha",
+    "Banik Ostrava": "Baník Ostrava",
+    "Jablonec": "Jablonec",
+    "Hradec Králové": "Hradec Králové",
     "Slovan Liberec": "Slovan Liberec",
     "Sigma Olomouc": "Sigma Olomouc",
-    "FK Teplice": "Teplice",
-    "FK Mladá Boleslav": "Mladá Boleslav",
-    "Bohemians Praha 1905": "Bohemians 1905",
-    "MFK Karviná": "Karviná",
-    "1. FC Slovácko": "Slovácko",
-    "FK Dukla Praha": "Dukla Praha",
-    "FK Pardubice": "Pardubice",
-    "FC Zlín": "Zlín"
+    "Teplice": "Teplice",
+    "Mladá Boleslav": "Mladá Boleslav",
+    "Bohemians Praha": "Bohemians 1905",
+    "Karvina": "Karviná",
+    "Slovácko": "Slovácko",
+    "Dukla": "Dukla Praha",
+    "Pardubice": "Pardubice",
+    "Tescoma Zlin": "Zlín"
 }
 
 OUTPUT_CSV = "elo.csv"
@@ -53,15 +53,18 @@ def fetch_elo_table():
     resp = requests.get(URL, timeout=60)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.content, "html.parser")
-    table = soup.find("div", id="Ranking").find("table")
+    # table = soup.find("div", id="Ranking").find("table")
+    table = soup.find("table", class_="ranking")    
     rows = table.find_all("tr")
     elo_data = []
     for row in rows[1:]:  # skip header
         cells = row.find_all(["td", "th"])
-        if len(cells) < 9:
+        if len(cells) < 6:
             continue  # skip incomplete rows
-        team_name = cells[1].get_text(strip=True)
-        rating = cells[8].get_text(strip=True)
+        team_name = cells[1].find("a").text.strip()
+        rating = cells[2].get_text(strip=True)
+        # team_name = cells[1].get_text(strip=True)
+        # rating = cells[8].get_text(strip=True)
         short_code = TEAM_CODES.get(team_name)
         if short_code:
             czech_name = CZECH_NAMES.get(team_name)
